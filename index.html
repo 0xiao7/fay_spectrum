@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Fay's Spectrum — 2026 記帳士備考</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ── 色卡取色：昨日青空 × 茉莉花茶 × 烟雨江南 × 粉墨登場 ── */
+:root {
+  --bg:        #f6f4f0;
+  --surface:   #ede9e2;
+  --card:      #faf8f5;
+  --blue:      #a1c7f6;   /* 昨日青空 */
+  --blue-m:    #7aa8d4;
+  --blue-d:    #4a7aaa;
+  --blue-l:    #daeeff;
+  --teal:      #a0d1ca;   /* 烟雨江南 */
+  --teal-m:    #5fa8a0;
+  --teal-l:    #dcf2f0;
+  --rose:      #f8bcb5;   /* 茉莉花茶/水蜜桃 */
+  --rose-m:    #e88c84;
+  --rose-l:    #fde8e6;
+  --purple:    #cab3c7;   /* 粉墨登場 */
+  --purple-m:  #9d7898;
+  --purple-l:  #eedde9;
+  --amber:     #f8e0b8;   /* 加州日落 */
+  --amber-m:   #d4a865;
+  --amber-l:   #fdf3e3;
+  --sage:      #c6deb4;   /* 抹茶/柳葉 */
+  --sage-m:    #89b870;
+  --sage-l:    #eaf4e2;
+  --text:      #3a3530;
+  --muted:     #7a726a;
+  --hint:      #aaa098;
+  --border:    rgba(58,53,48,.09);
+  --borderM:   rgba(58,53,48,.18);
+  --r:9px; --rl:14px;
+  --shadow: 0 2px 14px rgba(58,53,48,.07);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{-webkit-text-size-adjust:100%;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;}
+
+/* ── Shell ── */
+.shell{display:flex;height:100dvh;overflow:hidden;}
+
+/* ── Sidebar ── */
+.sidebar{
+  width:210px;flex-shrink:0;
+  background:var(--card);border-right:0.5px solid var(--border);
+  display:flex;flex-direction:column;padding:1.4rem 1rem;
+  transition:transform .3s ease;z-index:100;
+}
+.logo{margin-bottom:1.75rem;}
+.logo h1{font-family:'Noto Serif TC',serif;font-size:17px;font-weight:400;letter-spacing:.04em;}
+.logo p{font-size:10px;color:var(--hint);letter-spacing:.08em;margin-top:3px;}
+
+.nav{display:flex;flex-direction:column;gap:2px;flex:1;}
+.ni{
+  display:flex;align-items:center;gap:9px;
+  padding:9px 11px;border-radius:var(--r);
+  cursor:pointer;font-size:13px;color:var(--muted);
+  border:none;background:transparent;text-align:left;width:100%;
+  transition:all .15s;font-family:'DM Sans',sans-serif;
+}
+.ni:hover{background:var(--surface);color:var(--text);}
+.ni.on{background:var(--blue-l);color:var(--text);font-weight:500;}
+.ni-ic{font-size:13px;width:16px;text-align:center;}
+
+.sf{border-top:0.5px solid var(--border);padding-top:.9rem;margin-top:.9rem;}
+.streak{
+  display:flex;align-items:center;gap:6px;
+  background:var(--amber-l);border-radius:99px;
+  padding:5px 11px;font-size:11px;color:#8a6020;font-weight:500;
+  border:0.5px solid var(--amber);
+}
+.exam-cd{margin-top:.75rem;text-align:center;}
+.cd-n{font-family:'Noto Serif TC',serif;font-size:32px;font-weight:300;color:var(--blue-d);}
+.cd-l{font-size:10px;color:var(--hint);letter-spacing:.06em;}
+
+/* ── Hamburger ── */
+.hbg{
+  display:none;position:fixed;top:12px;left:12px;z-index:200;
+  background:var(--card);border:0.5px solid var(--border);
+  border-radius:var(--r);width:36px;height:36px;
+  align-items:center;justify-content:center;cursor:pointer;font-size:15px;
+  box-shadow:var(--shadow);
+}
+@media(max-width:680px){
+  .hbg{display:flex;}
+  .sidebar{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%);z-index:150;}
+  .sidebar.open{transform:translateX(0);box-shadow:6px 0 24px rgba(0,0,0,.1);}
+  .main{padding:1rem!important;}
+  .mx{grid-template-columns:repeat(2,1fr)!important;}
+  .two-col{grid-template-columns:1fr!important;}
+}
+.mask{display:none;position:fixed;inset:0;z-index:140;background:rgba(0,0,0,.2);}
+.mask.show{display:block;}
+
+/* ── Main ── */
+.main{flex:1;overflow-y:auto;padding:2rem 1.75rem;}
+.pg-title{
+  font-family:'Noto Serif TC',serif;font-size:22px;font-weight:300;
+  margin-bottom:1.5rem;letter-spacing:.03em;color:var(--text);
+}
+
+/* ── Panes ── */
+.pane{display:none;}
+.pane.on{display:block;}
+
+/* ── Cards ── */
+.card{
+  background:var(--card);border-radius:var(--rl);
+  border:0.5px solid var(--border);padding:1.2rem 1.4rem;
+  margin-bottom:.9rem;box-shadow:var(--shadow);
+}
+.sec{font-size:10px;letter-spacing:.08em;color:var(--hint);text-transform:uppercase;font-weight:500;margin-bottom:11px;}
+
+/* ── Metrics ── */
+.mx{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:.9rem;}
+.m{background:var(--surface);border-radius:var(--r);padding:.85rem 1rem;}
+.ml{font-size:10px;color:var(--hint);letter-spacing:.04em;margin-bottom:3px;}
+.mv{font-family:'Noto Serif TC',serif;font-size:26px;font-weight:300;}
+.mv.b{color:var(--blue-d);}.mv.t{color:var(--teal-m);}.mv.r{color:var(--rose-m);}.mv.s{color:var(--sage-m);}
+.mu{font-size:10px;color:var(--hint);margin-top:1px;}
+
+/* ── Bars ── */
+.br{margin-bottom:10px;}
+.bl{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;}
+.bl span{color:var(--muted);font-size:11px;}
+.bt{height:4px;background:var(--surface);border-radius:99px;overflow:hidden;}
+.bf{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.22,1,.36,1);}
+
+/* ── Mini charts ── */
+.mini-chart{display:flex;align-items:flex-end;height:60px;gap:4px;}
+.mb{flex:1;border-radius:3px 3px 0 0;min-height:3px;transition:height .5s ease;}
+.cl{display:flex;justify-content:space-between;margin-top:3px;}
+.cl span{font-size:9px;color:var(--hint);}
+
+/* ── Donut ── */
+.dw{display:flex;align-items:center;gap:18px;}
+.dr{flex:1;}
+.drow{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:11px;}
+.drow:last-child{border-bottom:none;}
+
+/* ── Two col ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin-bottom:.9rem;}
+.two-col .card{margin-bottom:0;}
+
+/* ── Pills ── */
+.pills{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;}
+.pill{
+  padding:5px 13px;border-radius:99px;
+  border:0.5px solid var(--borderM);background:transparent;
+  cursor:pointer;font-size:11px;color:var(--muted);
+  transition:all .15s;font-family:'DM Sans',sans-serif;
+}
+.pill.on{background:var(--blue-l);border-color:var(--blue-m);color:var(--text);}
+.pill:hover:not(.on){background:var(--surface);color:var(--text);}
+
+/* ── Typing ── */
+.ty-disp{
+  background:var(--surface);border-radius:var(--r);
+  padding:1rem 1.25rem;min-height:70px;
+  font-size:18px;line-height:1.95;letter-spacing:.03em;
+  font-family:'Noto Serif TC',serif;
+  margin-bottom:.75rem;word-break:break-word;
+}
+.cc{color:var(--sage-m);}
+.cw{color:var(--rose-m);text-decoration:underline;text-decoration-color:rgba(232,140,132,.4);}
+.cur{background:var(--blue-l);border-radius:2px;animation:bl .75s infinite;}
+.cp{color:var(--hint);}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.15}}
+
+.ty-in{
+  width:100%;border:0.5px solid var(--borderM);
+  background:var(--card);border-radius:var(--r);
+  padding:11px 14px;font-size:14px;
+  font-family:'DM Sans',sans-serif;color:var(--text);
+  outline:none;resize:none;height:46px;
+  -webkit-appearance:none;transition:border-color .2s;
+  ime-mode:auto;
+}
+.ty-in:focus{border-color:var(--blue-m);}
+.ty-in:disabled{opacity:.5;pointer-events:none;}
+
+/* ── Lang toggle ── */
+.lang-toggle{
+  display:flex;background:var(--surface);border-radius:99px;
+  padding:3px;gap:2px;width:fit-content;margin-bottom:10px;
+}
+.lt{
+  padding:5px 14px;border-radius:99px;border:none;
+  background:transparent;cursor:pointer;font-size:12px;
+  font-family:'DM Sans',sans-serif;color:var(--muted);transition:all .2s;
+}
+.lt.on{background:var(--card);color:var(--text);font-weight:500;box-shadow:0 1px 4px rgba(0,0,0,.08);}
+
+/* ── Timer ── */
+.timer-wrap{display:flex;align-items:center;gap:7px;}
+.timer-num{font-size:13px;font-weight:500;color:var(--blue-d);}
+.timer-num.hot{color:var(--rose-m);}
+
+/* ── Typing stats ── */
+.ty-stats{display:flex;gap:14px;margin-top:10px;align-items:center;flex-wrap:wrap;}
+.ty-stats span{font-size:12px;}
+.ty-stats strong{font-weight:500;}
+
+/* ── Result ── */
+.result{
+  background:var(--teal-l);border:0.5px solid var(--teal);
+  border-radius:var(--r);padding:.9rem 1.2rem;
+  display:none;margin-bottom:.75rem;
+}
+.result.show{display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+.rw{font-family:'Noto Serif TC',serif;font-size:28px;font-weight:300;color:var(--text);}
+.rs{font-size:11px;color:var(--muted);margin-top:3px;}
+
+/* ── Article cards ── */
+.ac{
+  background:var(--surface);border-radius:var(--r);
+  padding:.75rem 1rem;margin-bottom:6px;cursor:pointer;
+  border:0.5px solid transparent;transition:all .15s;
+}
+.ac:hover{background:var(--blue-l);border-color:var(--border);}
+.ac.sel{background:var(--blue-l);border-color:var(--blue-m);}
+.ac-no{font-size:10px;color:var(--muted);margin-bottom:2px;}
+.ac-ti{font-size:13px;font-weight:500;}
+.ac-en{font-size:11px;color:var(--hint);margin-top:2px;}
+.stars{color:var(--rose-m);font-size:10px;}
+
+/* ── Weak ── */
+.wl{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:0.5px solid var(--border);font-size:12px;}
+.wl:last-child{border-bottom:none;}
+.wl-n{flex:1;}
+.wl-b{flex:2;height:4px;background:var(--surface);border-radius:99px;overflow:hidden;}
+.wl-f{height:100%;background:var(--rose-m);border-radius:99px;}
+.wl-p{font-size:11px;color:var(--muted);min-width:28px;text-align:right;}
+
+/* ── Notion ── */
+.n-in{
+  width:100%;border:0.5px solid var(--borderM);
+  background:var(--card);border-radius:var(--r);
+  padding:9px 12px;font-size:13px;font-family:'DM Sans',sans-serif;
+  color:var(--text);outline:none;margin-bottom:7px;
+  transition:border-color .2s;
+}
+.n-in:focus{border-color:var(--purple-m);}
+.nc{
+  background:var(--surface);border-radius:var(--r);
+  padding:.75rem 1rem;margin-bottom:6px;
+  border-left:3px solid var(--blue-m);
+}
+.nc.teal{border-left-color:var(--teal-m);}
+.nc.rose{border-left-color:var(--rose-m);}
+.nc.sage{border-left-color:var(--sage-m);}
+.nc-law{font-size:10px;color:var(--muted);margin-bottom:2px;}
+.nc-ti{font-size:14px;font-weight:500;}
+.nc-en{font-size:11px;color:var(--hint);margin-top:2px;}
+
+/* ── GAS guide ── */
+.code-block{
+  background:var(--surface);border-radius:var(--r);
+  padding:.9rem 1rem;font-size:11px;font-family:monospace;
+  color:var(--text);line-height:1.7;overflow-x:auto;
+  border:0.5px solid var(--border);margin-bottom:.75rem;
+  white-space:pre-wrap;word-break:break-all;
+}
+
+/* ── Btn ── */
+.btn{
+  padding:7px 16px;border-radius:var(--r);
+  border:0.5px solid var(--borderM);background:transparent;
+  cursor:pointer;font-size:12px;font-family:'DM Sans',sans-serif;
+  color:var(--text);transition:all .15s;
+}
+.btn:hover{background:var(--surface);}
+.btn-blue{background:var(--blue);border-color:var(--blue-m);color:var(--text);}
+.btn-blue:hover{background:var(--blue-l);}
+.btn-teal{background:var(--teal);border-color:var(--teal-m);color:var(--text);}
+.btn-rose{background:var(--rose);border-color:var(--rose-m);color:var(--text);}
+.btn-sm{padding:5px 11px;font-size:11px;}
+
+/* ── Toast ── */
+.toast{
+  position:fixed;bottom:20px;right:20px;
+  background:var(--teal-m);color:#fff;border-radius:var(--r);
+  padding:10px 16px;font-size:12px;display:none;z-index:999;
+  box-shadow:0 4px 16px rgba(0,0,0,.15);
+}
+.toast.show{display:block;}
+
+/* ── Tag ── */
+.tag{font-size:10px;font-family:'DM Sans',sans-serif;padding:2px 7px;border-radius:4px;background:var(--surface);color:var(--muted);}
+.flex{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.divider{height:0.5px;background:var(--border);margin:.75rem 0;}
+
+/* ── Schedule ── */
+.sr{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--border);}
+.sr:last-child{border-bottom:none;}
+.sd{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.st{font-size:11px;color:var(--muted);min-width:88px;}
+.sk{font-size:13px;flex:1;}
+.sw{font-size:10px;color:var(--hint);}
+
+/* ── Now indicator ── */
+.now-card{
+  background:var(--blue-l);border:0.5px solid var(--blue);
+  border-radius:var(--r);padding:.9rem 1.1rem;margin-bottom:.9rem;
+}
+.now-cur{font-size:15px;font-weight:500;color:var(--blue-d);}
+.now-next{font-size:12px;color:var(--muted);margin-top:3px;}
+</style>
+</head>
+<body>
+
+<button class="hbg" id="hbg" onclick="toggleSidebar()">☰</button>
+<div class="mask" id="mask" onclick="toggleSidebar()"></div>
+
+<div class="shell">
+
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sidebar">
+  <div class="logo">
+    <h1>Fay's Spectrum</h1>
+    <p>2026 記帳士備考中控</p>
+  </div>
+  <div class="nav">
+    <button class="ni on" onclick="sw('dash',this)"><span class="ni-ic">◈</span>儀表板</button>
+    <button class="ni" onclick="sw('typing',this)"><span class="ni-ic">◎</span>打字練習</button>
+    <button class="ni" onclick="sw('weak',this)"><span class="ni-ic">◇</span>弱點分析</button>
+    <button class="ni" onclick="sw('notion',this)"><span class="ni-ic">◉</span>Notion 速查</button>
+    <button class="ni" onclick="sw('gas',this)"><span class="ni-ic">◐</span>GAS 後端設定</button>
+    <button class="ni" onclick="sw('sched',this)"><span class="ni-ic">○</span>作息時刻表</button>
+  </div>
+  <div class="sf">
+    <div class="streak" id="streakBadge">🔥 連讀 <span id="streakN">0</span> 天</div>
+    <div class="exam-cd">
+      <div class="cd-n" id="sideCD">—</div>
+      <div class="cd-l">天後考試</div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- ── 儀表板 ── -->
+<div class="pane on" id="pane-dash">
+  <div class="pg-title">今日概況</div>
+
+  <div class="mx">
+    <div class="m"><div class="ml">考試倒數</div><div class="mv b" id="d-days">—</div><div class="mu">天</div></div>
+    <div class="m"><div class="ml">今日已讀</div><div class="mv t" id="d-today">0</div><div class="mu">條</div></div>
+    <div class="m"><div class="ml">累計條次</div><div class="mv r" id="d-total">187</div><div class="mu">次</div></div>
+    <div class="m"><div class="ml">最佳 WPM</div><div class="mv s" id="d-wpm">—</div><div class="mu">wpm</div></div>
+  </div>
+
+  <div class="card">
+    <div class="sec">科目能量分配 — 考試權重</div>
+    <div class="br"><div class="bl"><strong>會計學概要</strong><span>35% · 絕對核心</span></div><div class="bt"><div class="bf" style="width:62%;background:var(--blue-m)"></div></div></div>
+    <div class="br"><div class="bl"><strong>稅務相關法規</strong><span>30% · 關鍵支柱</span></div><div class="bt"><div class="bf" style="width:45%;background:var(--purple-m)"></div></div></div>
+    <div class="br"><div class="bl"><strong>租稅申報實務</strong><span>25% · 實戰強化</span></div><div class="bt"><div class="bf" style="width:38%;background:var(--rose-m)"></div></div></div>
+    <div class="br" style="margin:0"><div class="bl"><strong>記帳相關法規</strong><span>10% · 記憶守備</span></div><div class="bt"><div class="bf" style="width:70%;background:var(--sage-m)"></div></div></div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="sec">每日讀條（本週）</div>
+      <div class="mini-chart" id="dailyChart"></div>
+      <div class="cl"><span>週一</span><span>週日</span></div>
+    </div>
+    <div class="card">
+      <div class="sec">英打 WPM 成長</div>
+      <div class="mini-chart" id="wpmChart"></div>
+      <div class="cl"><span>最早</span><span>最近</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sec">複習階段分布</div>
+    <div class="dw">
+      <svg width="90" height="90" viewBox="0 0 90 90">
+        <circle cx="45" cy="45" r="34" fill="none" stroke="var(--surface)" stroke-width="13"/>
+        <circle cx="45" cy="45" r="34" fill="none" stroke="var(--blue)" stroke-width="13" stroke-dasharray="64 150" stroke-dashoffset="-38" transform="rotate(-90 45 45)"/>
+        <circle cx="45" cy="45" r="34" fill="none" stroke="var(--purple)" stroke-width="13" stroke-dasharray="43 171" stroke-dashoffset="-102" transform="rotate(-90 45 45)"/>
+        <circle cx="45" cy="45" r="34" fill="none" stroke="var(--rose)" stroke-width="13" stroke-dasharray="32 182" stroke-dashoffset="-145" transform="rotate(-90 45 45)"/>
+        <circle cx="45" cy="45" r="34" fill="none" stroke="var(--sage)" stroke-width="13" stroke-dasharray="75 139" stroke-dashoffset="-177" transform="rotate(-90 45 45)"/>
+        <text x="45" y="48" text-anchor="middle" font-size="10" font-family="DM Sans" fill="var(--muted)">220條</text>
+      </svg>
+      <div class="dr">
+        <div class="drow"><span><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--blue);margin-right:6px"></span>第0輪（未讀）</span><span style="color:var(--muted)">30%</span></div>
+        <div class="drow"><span><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--purple);margin-right:6px"></span>第1輪</span><span style="color:var(--muted)">20%</span></div>
+        <div class="drow"><span><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--rose);margin-right:6px"></span>第2輪</span><span style="color:var(--muted)">15%</span></div>
+        <div class="drow"><span><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--sage);margin-right:6px"></span>第3輪以上</span><span style="color:var(--muted)">35%</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 打字練習 ── -->
+<div class="pane" id="pane-typing">
+  <div class="pg-title">打字練習</div>
+
+  <div class="card">
+    <div class="flex" style="justify-content:space-between;margin-bottom:10px;">
+      <!-- 中/英切換 -->
+      <div class="lang-toggle">
+        <button class="lt on" id="ltEN" onclick="setLang('en',this)">English</button>
+        <button class="lt" id="ltZH" onclick="setLang('zh',this)">中文</button>
+      </div>
+      <!-- 計時器 -->
+      <div class="timer-wrap">
+        <svg width="30" height="30" viewBox="0 0 30 30" style="transform:rotate(-90deg)">
+          <circle cx="15" cy="15" r="12" fill="none" stroke="var(--surface)" stroke-width="3"/>
+          <circle cx="15" cy="15" r="12" fill="none" stroke="var(--blue-m)" stroke-width="3"
+            stroke-dasharray="75" stroke-dashoffset="0" id="timerArc"
+            style="transition:stroke-dashoffset .5s linear;"/>
+        </svg>
+        <span class="timer-num" id="timerNum">60</span>
+        <button class="btn btn-sm" id="timerBtn" onclick="toggleTimer()">計時模式</button>
+      </div>
+    </div>
+
+    <div class="pills" id="modePills">
+      <button class="pill on" onclick="selMode(this,'law_en')">法條關鍵字</button>
+      <button class="pill" onclick="selMode(this,'tax_en')">稅法英文</button>
+      <button class="pill" onclick="selMode(this,'star5_en')">★★★★★ 抽題</button>
+      <button class="pill" onclick="selMode(this,'law_zh')">法條中文</button>
+      <button class="pill" onclick="selMode(this,'star5_zh')">★★★★★ 中文</button>
+      <button class="pill" onclick="selMode(this,'custom')">自訂</button>
+    </div>
+
+    <div class="result" id="resultBox">
+      <div><div class="rw" id="rWpm">0 WPM</div><div class="rs" id="rAcc">準確率 100%</div></div>
+      <div style="flex:1"></div>
+      <div style="text-align:right"><div style="font-size:10px;color:var(--hint)">最佳紀錄</div><div style="font-family:'Noto Serif TC',serif;font-size:20px;font-weight:300;color:var(--blue-d)" id="rBest">—</div></div>
+      <button class="btn btn-teal btn-sm" onclick="pushToLINE()" id="pushBtn">📱 推播到 LINE</button>
+    </div>
+
+    <div class="ty-disp" id="tyDisp"></div>
+    <textarea class="ty-in" id="tyIn"
+      placeholder="點此開始打字…"
+      oninput="onInput()"
+      onkeydown="onKD(event)"
+      spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="none"></textarea>
+
+    <div class="ty-stats">
+      <span>速度 <strong id="stWpm" style="color:var(--blue-d)">0</strong> WPM</span>
+      <span>準確 <strong id="stAcc" style="color:var(--sage-m)">100</strong>%</span>
+      <span>進度 <strong id="stProg" style="color:var(--purple-m)">0/0</strong></span>
+      <div style="flex:1"></div>
+      <button class="btn btn-sm" onclick="nextText()">換題</button>
+      <button class="btn btn-blue btn-sm" onclick="resetTy()">重置</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sec">法條速查（點選即練）</div>
+    <div id="artList"></div>
+  </div>
+</div>
+
+<!-- ── 弱點分析 ── -->
+<div class="pane" id="pane-weak">
+  <div class="pg-title">弱點分析</div>
+  <div class="card">
+    <div class="sec">錯誤率排行（從打字記錄推算）</div>
+    <div id="weakList"></div>
+  </div>
+  <div class="card">
+    <div class="sec">今日備考建議</div>
+    <div id="weakSug" style="font-size:13px;line-height:1.8;color:var(--muted)"></div>
+    <div class="divider"></div>
+    <div class="flex">
+      <button class="btn btn-sm" onclick="renderWeak()">重新分析</button>
+      <button class="btn btn-rose btn-sm" onclick="pushToLINE()">📱 推播弱點到 LINE</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="sec">英打錯字記憶（本次）</div>
+    <div id="wrongLog" style="font-size:13px;color:var(--muted)">完成一輪英打後顯示</div>
+  </div>
+</div>
+
+<!-- ── Notion 速查 ── -->
+<div class="pane" id="pane-notion">
+  <div class="pg-title">Notion 速查</div>
+  <div class="card">
+    <div class="sec">連接你的資料庫</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.7;">
+      API Key 只存在瀏覽器記憶體，關閉即清除。建議用下方「GAS 後端設定」頁面設定中轉，更安全。
+    </div>
+    <input class="n-in" id="nKey" type="password" placeholder="Notion API Key（secret_xxx）"/>
+    <input class="n-in" id="nDB" placeholder="LAW_DB ID" value="30d6e707a54381efa78dc298446a0c5a"/>
+    <div class="flex">
+      <button class="btn btn-blue btn-sm" onclick="notionConnect()">連接</button>
+      <span id="nStatus" style="font-size:11px;color:var(--muted)"></span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="sec">法條快查</div>
+    <div class="flex" style="margin-bottom:10px;">
+      <input class="n-in" id="nQ" placeholder="條號（13）或關鍵字（進項、核課）" style="flex:1;margin:0;" onkeydown="if(event.key==='Enter')notionSearch()"/>
+      <button class="btn btn-blue btn-sm" onclick="notionSearch()">查詢</button>
+    </div>
+    <div id="nRes"></div>
+  </div>
+  <div class="card">
+    <div class="sec">★★★★★ 重點預覽（本地）</div>
+    <div id="star5"></div>
+  </div>
+</div>
+
+<!-- ── GAS 後端設定 ── -->
+<div class="pane" id="pane-gas">
+  <div class="pg-title">GAS 後端設定</div>
+  <div class="card">
+    <div class="sec">為什麼需要 GAS 中轉？</div>
+    <p style="font-size:13px;line-height:1.8;color:var(--muted)">
+      直接在前端呼叫 Notion API 會暴露你的 API Key（任何人打開 DevTools 都看得到）。
+      透過 GAS 當中轉層，前端只送查詢字串，Key 永遠在 GAS 伺服器端，安全多了。
+      同時 GAS 也能串接 LINE Bot 推播，打完高分自動通知你。
+    </p>
+  </div>
+  <div class="card">
+    <div class="sec">GAS Proxy 腳本（貼到 apps.script.google.com）</div>
+    <div class="code-block">// ── Fay's Spectrum GAS Proxy ──
+// 在 GAS 指令碼屬性設定：
+// NOTION_API_KEY, NOTION_LAW_DB_ID, LINE_CHANNEL_ACCESS_TOKEN, LINE_USER_ID
+
+const P = PropertiesService.getScriptProperties();
+
+function doGet(e) {
+  const action = e.parameter.action;
+  const q      = e.parameter.q || '';
+
+  if (action === 'search') {
+    return ContentService
+      .createTextOutput(JSON.stringify(notionSearch(q)))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  if (action === 'star5') {
+    return ContentService
+      .createTextOutput(JSON.stringify(notionStar5()))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  if (action === 'push') {
+    const msg = e.parameter.msg || '';
+    linePush(msg);
+    return ContentService
+      .createTextOutput('{"ok":true}')
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  return ContentService.createTextOutput('{"error":"unknown action"}');
+}
+
+function notionSearch(q) {
+  const key = P.getProperty('NOTION_API_KEY');
+  const db  = P.getProperty('NOTION_LAW_DB_ID');
+  const isNum = /^\d+/.test(q);
+  const filter = isNum
+    ? {property:'條號', title:{contains:'§ '+q}}
+    : {or:[
+        {property:'關鍵字', multi_select:{contains:q}},
+        {property:'條號',   title:{contains:q}}
+      ]};
+  const res = UrlFetchApp.fetch(
+    'https://api.notion.com/v1/databases/'+db+'/query',
+    { method:'POST',
+      headers:{Authorization:'Bearer '+key,'Notion-Version':'2022-06-28','Content-Type':'application/json'},
+      payload: JSON.stringify({filter, page_size:6})
+    }
+  );
+  return JSON.parse(res.getContentText());
+}
+
+function notionStar5() {
+  const key = P.getProperty('NOTION_API_KEY');
+  const db  = P.getProperty('NOTION_LAW_DB_ID');
+  const res = UrlFetchApp.fetch(
+    'https://api.notion.com/v1/databases/'+db+'/query',
+    { method:'POST',
+      headers:{Authorization:'Bearer '+key,'Notion-Version':'2022-06-28','Content-Type':'application/json'},
+      payload: JSON.stringify({
+        filter:{property:'重要性', select:{equals:'★★★★★'}},
+        page_size:10
+      })
+    }
+  );
+  return JSON.parse(res.getContentText());
+}
+
+function linePush(msg) {
+  const token = P.getProperty('LINE_CHANNEL_ACCESS_TOKEN');
+  const uid   = P.getProperty('LINE_USER_ID');
+  UrlFetchApp.fetch('https://api.line.me/v2/bot/message/push', {
+    method:'post',
+    headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
+    payload: JSON.stringify({to:uid, messages:[{type:'text',text:msg}]})
+  });
+}</div>
+    <div style="font-size:12px;color:var(--muted);line-height:1.8;margin-top:10px;">
+      部署後取得 <strong>Web App URL</strong>，貼到下方：
+    </div>
+    <input class="n-in" id="gasURL" placeholder="https://script.google.com/macros/s/xxx/exec" style="margin-top:8px;"/>
+    <button class="btn btn-blue btn-sm" onclick="saveGAS()">儲存 URL</button>
+    <span id="gasSaved" style="font-size:11px;color:var(--sage-m);margin-left:8px;"></span>
+  </div>
+  <div class="card">
+    <div class="sec">LINE 推播設定</div>
+    <input class="n-in" id="lineUID" placeholder="LINE User ID（Ud5711b...）" value="Ud5711b77b7487d15ef66c356ae771dd9"/>
+    <div style="font-size:12px;color:var(--muted);line-height:1.7;">
+      推播功能透過 GAS 中轉，不需要在前端存 LINE Token。只需填 User ID 作為識別。
+    </div>
+  </div>
+</div>
+
+<!-- ── 作息時刻表 ── -->
+<div class="pane" id="pane-sched">
+  <div class="pg-title">作息時刻表</div>
+  <div class="now-card" id="nowCard">
+    <div class="now-cur" id="nowCur">讀取中...</div>
+    <div class="now-next" id="nowNext"></div>
+  </div>
+  <div class="two-col">
+    <div class="card" style="text-align:center">
+      <div class="sec">考試倒數</div>
+      <div style="font-family:'Noto Serif TC',serif;font-size:48px;font-weight:300;color:var(--blue-d)" id="bigCD">—</div>
+      <div style="font-size:11px;color:var(--hint);margin-top:4px;">天後考試 · 2026/11/14</div>
+    </div>
+    <div class="card">
+      <div class="sec">考試科目</div>
+      <div style="font-size:12px;line-height:2;color:var(--muted)">
+        11/14（六）<br>
+        ▸ 會計學概要<br>
+        ▸ 記帳相關法規<br>
+        11/15（日）<br>
+        ▸ 稅務相關法規<br>
+        ▸ 租稅申報實務
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="sec">每日作息 · 4月起新制</div>
+    <div class="sr"><div class="sd" style="background:var(--rose-m)"></div><div class="st">09:00 – 12:30</div><div class="sk">半天工作</div><div class="sw">高產出</div></div>
+    <div class="sr"><div class="sd" style="background:var(--blue-m)"></div><div class="st">13:00 – 15:30</div><div class="sk">會計學概要</div><div class="sw">35%</div></div>
+    <div class="sr"><div class="sd" style="background:var(--purple-m)"></div><div class="st">15:30 – 17:30</div><div class="sk">稅務相關法規</div><div class="sw">30%</div></div>
+    <div class="sr"><div class="sd" style="background:var(--rose-m)"></div><div class="st">17:30 – 19:00</div><div class="sk">租稅申報實務</div><div class="sw">25%</div></div>
+    <div class="sr"><div class="sd" style="background:var(--sage-m)"></div><div class="st">19:00 – 20:00</div><div class="sk">記帳相關法規</div><div class="sw">10%</div></div>
+    <div class="sr"><div class="sd" style="background:var(--hint)"></div><div class="st">20:00 – 21:00</div><div class="sk">複習 + 打字練習</div><div class="sw">鞏固</div></div>
+    <div class="sr"><div class="sd" style="background:var(--teal-m)"></div><div class="st">21:30 – 22:30</div><div class="sk">健身房</div><div class="sw">修復</div></div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════
+// 資料庫
+// ══════════════════════════════════════════════
+const TEXTS_EN = {
+  law_en:[
+    "Tax Agent Act defines the scope of practice for registered bookkeepers in Taiwan.",
+    "Business Accounting Act requires faithful recording of all commercial transactions.",
+    "Article 21 of Tax Collection Act stipulates the statute of limitations for tax.",
+    "Value Added Tax shall be calculated at the standard rate of five percent.",
+    "The Income Tax Act governs assessment of individual and corporate income tax.",
+    "Estate and Gift Tax Act requires declaration within six months of inheritance.",
+    "Penalty for late filing shall not exceed three times the original tax amount.",
+    "The taxpayer shall submit the annual income tax return before May thirty-first.",
+    "Anti-Money Laundering regulations require verification of beneficial ownership.",
+    "Controlled Foreign Corporation rules apply when passive income exceeds threshold.",
+    "Article 48 of Tax Collection Act allows voluntary disclosure to reduce penalties.",
+    "Bookkeepers must renew their license every two years through continuing education.",
+  ],
+  tax_en:[
+    "withholding tax deduction exemption assessment refund penalty surcharge levy",
+    "progressive tax bracket marginal rate gross income net income deductible allowance",
+    "value added tax input tax output tax zero rated exempt supply invoice receipt",
+    "estate tax gift tax unified credit exclusion valuation appraisal declaration",
+    "transfer pricing arm length principle controlled transaction documentation",
+    "minimum tax alternative minimum tax basic income threshold tax credits offset",
+    "business income tax depreciation amortization capital gain dividend interest",
+  ],
+  star5_en:[
+    "The scope of practice under Article 13 of the Tax Agent Act includes preparation of tax returns and bookkeeping.",
+    "Article 48 paragraph 1 of Tax Collection Act allows voluntary disclosure prior to investigation to avoid penalties.",
+    "The statute of limitations for tax evasion is seven years under Article 21 of Tax Collection Act.",
+    "Registered tax agents must complete thirty hours of continuing education every two years.",
+    "Business income tax shall be filed within five months after the close of the fiscal year.",
+  ],
+};
+
+const TEXTS_ZH = {
+  law_zh:[
+    "記帳士執行業務，應依法令規定，據實製作記帳憑證及帳簿。",
+    "商業會計法規定，商業使用之會計憑證，分為原始憑證及記帳憑證。",
+    "稅捐稽徵法第二十一條規定核課期間，一般為五年，逃漏稅為七年。",
+    "營業稅稅率，除本法另有規定外，為百分之五。",
+    "所得稅法規定，個人綜合所得稅應於次年五月一日至五月三十一日申報。",
+    "遺產及贈與稅法規定，繼承人應於被繼承人死亡之日起六個月內申報。",
+    "納稅者未依限繳納稅款者，每逾二日加徵欠稅額百分之一滯納金。",
+    "記帳士受委託辦理記帳及報稅，應盡善良管理人之注意義務。",
+    "商業負責人應依商業會計法規定保存會計憑證及帳簿至少十年。",
+  ],
+  star5_zh:[
+    "記帳士法第十三條規定執行業務範圍，包含各項稅務申報及帳務處理。",
+    "稅捐稽徵法第四十八條之一規定，未經檢舉主動補報並繳清稅款者免予處罰。",
+    "稅捐稽徵法第二十一條核課期間：一般五年，逃漏稅七年，未申報或匿報七年。",
+    "記帳士每二年至少完成三十小時繼續進修，否則撤銷執照。",
+    "營利事業所得稅應於每年五月一日起至五月三十一日止辦理結算申報。",
+  ],
+};
+
+const ARTICLES = [
+  {no:"§ 13",  law:"記帳士法",   ti:"執行業務範圍",    en:"Scope of Practice",              zh:"執行業務範圍包含各項稅務申報及帳務處理。", s:5},
+  {no:"§ 21",  law:"稅捐稽徵法", ti:"核課期間",         en:"Statute of Limitations",         zh:"一般五年，逃漏稅七年，未申報七年。",       s:5},
+  {no:"§ 35",  law:"稅捐稽徵法", ti:"申請復查",         en:"Application for Review",         zh:"納稅義務人得申請復查，期限三十日。",       s:4},
+  {no:"§ 48之1",law:"稅捐稽徵法",ti:"自動補報免罰",     en:"Voluntary Disclosure Relief",    zh:"未經檢舉主動補報繳清稅款者免予處罰。",    s:5},
+  {no:"§ 71",  law:"所得稅法",   ti:"結算申報期限",     en:"Annual Return Filing Deadline",  zh:"每年五月一日至三十一日辦理結算申報。",    s:4},
+  {no:"§ 19",  law:"營業稅法",   ti:"稅率百分之五",     en:"Standard VAT Rate Five Percent", zh:"營業稅稅率除另有規定外為百分之五。",      s:4},
+  {no:"§ 14",  law:"商業會計法", ti:"會計基礎",         en:"Accounting Basis Principles",    zh:"商業會計基礎採用權責發生制。",            s:3},
+  {no:"§ 1",   law:"記帳士法",   ti:"立法目的",         en:"Legislative Purpose",            zh:"為規定記帳士之資格及業務範圍而制定本法。",s:2},
+];
+
+const WEAK_DATA = [
+  {name:"稅捐稽徵法 §21 核課期間",  err:72},
+  {name:"所得稅法 §71 結算申報",    err:65},
+  {name:"商業會計法 §14 會計基礎",  err:58},
+  {name:"記帳士法 §13 業務範圍",    err:44},
+  {name:"營業稅法 §19 稅率",        err:38},
+];
+
+// ══════════════════════════════════════════════
+// 狀態
+// ══════════════════════════════════════════════
+const ST = {
+  lang:'en', mode:'law_en', text:'', typed:'', startT:null, done:false,
+  timerOn:false, timerSec:60, timerInt:null,
+  bestWpm: parseInt(localStorage.getItem('fs_wpm')||'0'),
+  wpmH:    JSON.parse(localStorage.getItem('fs_wpmh')||'[18,22,25,28,31,34]'),
+  daily:   JSON.parse(localStorage.getItem('fs_daily')||'[4,7,12,5,9,15,24]'),
+  streak:  parseInt(localStorage.getItem('fs_streak')||'3'),
+  todayR:  parseInt(localStorage.getItem('fs_today')||'0'),
+  wrongCh: {},
+  gasURL:  localStorage.getItem('fs_gas')||'',
+  notionKey:'', notionDB:'30d6e707a54381efa78dc298446a0c5a',
+};
+
+// ══════════════════════════════════════════════
+// 工具
+// ══════════════════════════════════════════════
+function toast(msg,dur=2500){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),dur);
+}
+
+function sw(id,btn){
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.ni').forEach(b=>b.classList.remove('on'));
+  document.getElementById('pane-'+id).classList.add('on');
+  btn.classList.add('on');
+  closeSidebar();
+  if(id==='dash')  renderDash();
+  if(id==='weak')  renderWeak();
+  if(id==='notion') renderStar5();
+  if(id==='sched') renderSched();
+}
+
+function toggleSidebar(){
+  const s=document.getElementById('sidebar');
+  const m=document.getElementById('mask');
+  s.classList.toggle('open');
+  m.classList.toggle('show');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('mask').classList.remove('show');
+}
+
+// ══════════════════════════════════════════════
+// 儀表板
+// ══════════════════════════════════════════════
+function renderDash(){
+  const d = daysLeft();
+  ['d-days','sideCD'].forEach(id=>document.getElementById(id).textContent=d);
+  document.getElementById('d-wpm').textContent = ST.bestWpm||'—';
+  document.getElementById('d-today').textContent = ST.todayR;
+  document.getElementById('streakN').textContent = ST.streak;
+
+  const dMax=Math.max(...ST.daily,1);
+  const colors=['var(--blue)','var(--purple)','var(--rose)','var(--sage)','var(--blue)','var(--purple)','var(--rose)'];
+  document.getElementById('dailyChart').innerHTML=
+    ST.daily.map((v,i)=>`<div class="mb" style="height:${Math.round(v/dMax*58)}px;background:${colors[i]};opacity:.8" title="${v}條"></div>`).join('');
+
+  const wMax=Math.max(...ST.wpmH,1);
+  document.getElementById('wpmChart').innerHTML=
+    ST.wpmH.slice(-8).map((v,i,a)=>`<div class="mb" style="height:${Math.round(v/wMax*58)}px;background:var(--teal);opacity:${.4+i/a.length*.5}" title="${v} WPM"></div>`).join('');
+}
+
+function daysLeft(){
+  return Math.max(0,Math.ceil((new Date('2026-11-14T09:00:00+08:00')-new Date())/864e5));
+}
+
+// ══════════════════════════════════════════════
+// 弱點
+// ══════════════════════════════════════════════
+function renderWeak(){
+  const mx=WEAK_DATA[0].err;
+  document.getElementById('weakList').innerHTML=WEAK_DATA.map(w=>`
+    <div class="wl">
+      <div class="wl-n">${w.name}</div>
+      <div class="wl-b"><div class="wl-f" style="width:${Math.round(w.err/mx*100)}%"></div></div>
+      <div class="wl-p">${w.err}%</div>
+    </div>`).join('');
+  document.getElementById('weakSug').innerHTML=
+    `本週最弱：<strong>稅捐稽徵法 §21 核課期間</strong>（錯誤率 72%）<br>
+    建議今日優先安排 30 分鐘複習，配合計時模式英打加深記憶錨點。<br>
+    同類陷阱：§24 移送強制執行期間、§35 申請復查期間——三條一起讀效率最高。<br><br>
+    <span style="color:var(--hint);font-size:11px;">* 錯誤率由英打練習中的錯誤字元自動推算，連接 Notion 後可取得真實複習數據。</span>`;
+}
+
+// ══════════════════════════════════════════════
+// 作息
+// ══════════════════════════════════════════════
+function renderSched(){
+  document.getElementById('bigCD').textContent=daysLeft();
+  updateNow();
+}
+
+function updateNow(){
+  const now=new Date();
+  const t=now.getHours()*60+now.getMinutes();
+  const slots=[
+    [0,9*60,'休息中','09:00 開始工作'],
+    [9*60,12*60+30,'工作時段','13:00 深度學習開始'],
+    [12*60+30,13*60,'午休','13:00 會計學概要'],
+    [13*60,15*60+30,'會計學概要','15:30 稅務相關法規'],
+    [15*60+30,17*60+30,'稅務相關法規','17:30 租稅申報實務'],
+    [17*60+30,19*60,'租稅申報實務','19:00 記帳相關法規'],
+    [19*60,20*60,'記帳相關法規','20:00 複習打字'],
+    [20*60,21*60,'複習 + 打字練習','21:30 健身房'],
+    [21*60,22*60+30,'健身房','22:30 休息'],
+    [22*60+30,24*60,'休息','明天 09:00'],
+  ];
+  for(const [s,e,cur,nxt] of slots){
+    if(t>=s && t<e){
+      document.getElementById('nowCur').textContent='現在：'+cur;
+      document.getElementById('nowNext').textContent='下一段：'+nxt;
+      return;
+    }
+  }
+}
+
+// ══════════════════════════════════════════════
+// 打字
+// ══════════════════════════════════════════════
+function setLang(lang, btn){
+  ST.lang=lang;
+  document.querySelectorAll('.lt').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  // 更新 mode
+  const modeMap={law_en:'law_en',tax_en:'tax_en',star5_en:'star5_en',law_zh:'law_zh',star5_zh:'star5_zh'};
+  if(lang==='en' && (ST.mode==='law_zh'||ST.mode==='star5_zh')){
+    selModeByName('law_en');
+  } else if(lang==='zh' && (ST.mode==='law_en'||ST.mode==='tax_en'||ST.mode==='star5_en')){
+    selModeByName('law_zh');
+  } else nextText();
+}
+
+function selModeByName(m){
+  ST.mode=m;
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('on'));
+  const modeLabels={law_en:'法條關鍵字',tax_en:'稅法英文',star5_en:'★★★★★ 抽題',law_zh:'法條中文',star5_zh:'★★★★★ 中文'};
+  document.querySelectorAll('.pill').forEach(p=>{
+    if(p.textContent===modeLabels[m]) p.classList.add('on');
+  });
+  nextText();
+}
+
+function selMode(btn,mode){
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('on'));
+  btn.classList.add('on');
+  if(mode==='custom'){
+    const t=prompt('輸入練習文字（中英均可）：');
+    if(t){ST.text=t.trim();ST.mode='custom';resetTy();}
+    return;
+  }
+  ST.mode=mode;
+  ST.lang = mode.endsWith('zh')?'zh':'en';
+  document.getElementById('ltEN').classList.toggle('on', ST.lang==='en');
+  document.getElementById('ltZH').classList.toggle('on', ST.lang==='zh');
+  nextText();
+}
+
+function getPool(){
+  if(ST.mode==='law_zh'||ST.mode==='star5_zh') return TEXTS_ZH[ST.mode]||TEXTS_ZH.law_zh;
+  return TEXTS_EN[ST.mode]||TEXTS_EN.law_en;
+}
+
+function nextText(){
+  const pool=getPool();
+  ST.text=pool[Math.floor(Math.random()*pool.length)];
+  resetTy();
+}
+
+function resetTy(){
+  ST.typed=''; ST.startT=null; ST.done=false; ST.wrongCh={};
+  const inp=document.getElementById('tyIn');
+  inp.value=''; inp.disabled=false;
+  document.getElementById('resultBox').classList.remove('show');
+  document.getElementById('stProg').textContent='0/'+(ST.text.length||0);
+  document.getElementById('stWpm').textContent='0';
+  document.getElementById('stAcc').textContent='100';
+  renderTy('');
+  if(ST.timerOn){clearInterval(ST.timerInt);ST.timerSec=60;updTimer();}
+}
+
+function renderTy(typed){
+  let h='';
+  for(let i=0;i<ST.text.length;i++){
+    const ch=ST.text[i]===' '?'&nbsp;':ST.text[i];
+    if(i<typed.length){
+      h+=typed[i]===ST.text[i]?`<span class="cc">${ch}</span>`:`<span class="cw">${ch}</span>`;
+    } else if(i===typed.length){
+      h+=`<span class="cur">${ch}</span>`;
+    } else h+=`<span class="cp">${ch}</span>`;
+  }
+  document.getElementById('tyDisp').innerHTML=h;
+}
+
+function onInput(){
+  const v=document.getElementById('tyIn').value;
+  ST.typed=v;
+  if(!ST.startT&&v.length>0){
+    ST.startT=Date.now();
+    if(ST.timerOn) startTimer();
+  }
+  if(ST.done) return;
+  renderTy(v);
+  const el=Math.max((Date.now()-ST.startT)/6e4,.0001);
+  const wpm=Math.round(v.trim().split(/\s+/).filter(Boolean).length/el);
+  let ok=0;
+  for(let i=0;i<v.length;i++){
+    if(v[i]===ST.text[i]) ok++;
+    else ST.wrongCh[ST.text[i]]=(ST.wrongCh[ST.text[i]]||0)+1;
+  }
+  const acc=v.length?Math.round(ok/v.length*100):100;
+  document.getElementById('stWpm').textContent=wpm;
+  document.getElementById('stAcc').textContent=acc;
+  document.getElementById('stProg').textContent=v.length+'/'+ST.text.length;
+
+  if(v.length>=ST.text.length){
+    ST.done=true;
+    document.getElementById('tyIn').disabled=true;
+    if(ST.timerOn) clearInterval(ST.timerInt);
+    finishTy(wpm,acc);
+  }
+}
+
+function finishTy(wpm,acc){
+  const isNew=wpm>ST.bestWpm;
+  if(isNew){ ST.bestWpm=wpm; localStorage.setItem('fs_wpm',wpm); document.getElementById('d-wpm').textContent=wpm; toast('🎉 新紀錄 '+wpm+' WPM！'); }
+  ST.wpmH.push(wpm);
+  if(ST.wpmH.length>20) ST.wpmH.shift();
+  localStorage.setItem('fs_wpmh',JSON.stringify(ST.wpmH));
+  ST.todayR++;
+  localStorage.setItem('fs_today',ST.todayR);
+  document.getElementById('d-today').textContent=ST.todayR;
+
+  document.getElementById('rWpm').textContent=wpm+' WPM';
+  document.getElementById('rAcc').textContent='準確率 '+acc+'%'+(acc>=95?' ✦ 優秀':acc>=85?' ✦ 良好':'');
+  document.getElementById('rBest').textContent=ST.bestWpm+' WPM';
+  document.getElementById('resultBox').classList.add('show');
+
+  const wk=Object.entries(ST.wrongCh).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  if(wk.length){
+    document.getElementById('wrongLog').innerHTML='本次最常打錯：'+wk.map(([k,v])=>`<span class="tag">${k}×${v}</span>`).join(' ');
+  }
+}
+
+function onKD(e){if(e.key==='Enter'&&ST.done){e.preventDefault();nextText();}}
+
+// ── 計時器 ──
+function toggleTimer(){
+  ST.timerOn=!ST.timerOn;
+  const btn=document.getElementById('timerBtn');
+  btn.textContent=ST.timerOn?'計時中':'計時模式';
+  btn.className=ST.timerOn?'btn btn-rose btn-sm':'btn btn-sm';
+  if(!ST.timerOn){clearInterval(ST.timerInt);ST.timerSec=60;updTimer();}
+  toast(ST.timerOn?'60秒衝刺！開始打字計時自動啟動':'已關閉計時模式');
+}
+
+function startTimer(){
+  clearInterval(ST.timerInt);
+  ST.timerSec=60;
+  ST.timerInt=setInterval(()=>{
+    ST.timerSec--;
+    updTimer();
+    if(ST.timerSec<=0){
+      clearInterval(ST.timerInt);
+      document.getElementById('tyIn').disabled=true;
+      ST.done=true;
+      toast('⏱ 時間到！');
+      const wpm=parseInt(document.getElementById('stWpm').textContent)||0;
+      const acc=parseInt(document.getElementById('stAcc').textContent)||100;
+      finishTy(wpm,acc);
+    }
+  },1000);
+}
+
+function updTimer(){
+  document.getElementById('timerNum').textContent=ST.timerSec;
+  document.getElementById('timerNum').className='timer-num'+(ST.timerSec<=10?' hot':'');
+  const arc=document.getElementById('timerArc');
+  arc.style.strokeDashoffset=75*(1-ST.timerSec/60);
+  arc.style.stroke=ST.timerSec<=10?'var(--rose-m)':'var(--blue-m)';
+}
+
+// ── 法條清單 ──
+function buildArtList(){
+  document.getElementById('artList').innerHTML=ARTICLES.map((a,i)=>`
+    <div class="ac" id="ac${i}" onclick="pickArt(${i})">
+      <div class="ac-no">${a.no} · ${a.law}</div>
+      <div class="ac-ti">${a.ti} <span class="stars">${'★'.repeat(a.s)}</span></div>
+      <div class="ac-en">${ST.lang==='zh'?a.zh:a.en}</div>
+    </div>`).join('');
+}
+
+function pickArt(i){
+  document.querySelectorAll('.ac').forEach(c=>c.classList.remove('sel'));
+  const el=document.getElementById('ac'+i);
+  if(el) el.classList.add('sel');
+  const a=ARTICLES[i];
+  ST.text=(ST.lang==='zh'?a.zh:a.en)+' ('+a.no+' '+a.law+')';
+  resetTy();
+}
+
+// ══════════════════════════════════════════════
+// Notion
+// ══════════════════════════════════════════════
+async function notionConnect(){
+  ST.notionKey=document.getElementById('nKey').value.trim();
+  ST.notionDB=document.getElementById('nDB').value.trim();
+  document.getElementById('nStatus').textContent='連接中...';
+  try{
+    const proxy=ST.gasURL;
+    if(proxy){
+      const r=await fetch(proxy+'?action=search&q=1');
+      document.getElementById('nStatus').textContent=r.ok?'✓ GAS 中轉連接成功':'✗ GAS 回應失敗';
+    } else {
+      // 直連（備用）
+      const r=await fetch(`https://api.notion.com/v1/databases/${ST.notionDB}`,{
+        headers:{Authorization:'Bearer '+ST.notionKey,'Notion-Version':'2022-06-28'}
+      });
+      document.getElementById('nStatus').textContent=r.ok?'✓ 直連成功（建議改用 GAS）':'✗ 失敗，確認 Key/DB';
+    }
+  } catch(e){ document.getElementById('nStatus').textContent='✗ 網路錯誤'; }
+}
+
+async function notionSearch(){
+  const q=document.getElementById('nQ').value.trim();
+  if(!q) return;
+  document.getElementById('nRes').innerHTML='<div style="font-size:12px;color:var(--muted)">查詢中...</div>';
+  try{
+    let data;
+    if(ST.gasURL){
+      const r=await fetch(ST.gasURL+'?action=search&q='+encodeURIComponent(q));
+      data=await r.json();
+    } else if(ST.notionKey){
+      const isNum=/^\d+/.test(q);
+      const filter=isNum
+        ?{property:'條號',title:{contains:'§ '+q}}
+        :{or:[{property:'關鍵字',multi_select:{contains:q}},{property:'條號',title:{contains:q}}]};
+      const r=await fetch(`https://api.notion.com/v1/databases/${ST.notionDB}/query`,{
+        method:'POST',
+        headers:{Authorization:'Bearer '+ST.notionKey,'Notion-Version':'2022-06-28','Content-Type':'application/json'},
+        body:JSON.stringify({filter,page_size:6})
+      });
+      data=await r.json();
+    } else {
+      document.getElementById('nRes').innerHTML='<div style="font-size:12px;color:var(--muted)">請先連接 Notion 或設定 GAS URL</div>';
+      return;
+    }
+    if(!data.results?.length){
+      document.getElementById('nRes').innerHTML='<div style="font-size:12px;color:var(--muted)">找不到結果</div>';
+      return;
+    }
+    const colors=['','teal','rose','sage'];
+    document.getElementById('nRes').innerHTML=data.results.map((p,i)=>{
+      const pr=p.properties;
+      const title=(pr['條號']?.title||[]).map(t=>t.plain_text).join('');
+      const imp=pr['重要性']?.select?.name||'';
+      const kw=(pr['關鍵字']?.multi_select||[]).map(k=>k.name).join('、');
+      return`<div class="nc ${colors[i%4]}">
+        <div class="nc-law">${imp}</div>
+        <div class="nc-ti">${title}</div>
+        ${kw?`<div class="nc-en">${kw}</div>`:''}
+      </div>`;
+    }).join('');
+    ST.todayR++;
+    document.getElementById('d-today').textContent=ST.todayR;
+  } catch(e){
+    document.getElementById('nRes').innerHTML='<div style="font-size:12px;color:var(--muted)">查詢失敗：'+e.message+'</div>';
+  }
+}
+
+function renderStar5(){
+  document.getElementById('star5').innerHTML=ARTICLES.filter(a=>a.s>=4).map((a,i)=>{
+    const colors=['','teal','rose','sage'];
+    return`<div class="nc ${colors[i%4]}" style="cursor:pointer" onclick="pickStar(${ARTICLES.indexOf(a)})">
+      <div class="nc-law">${a.law} · ${'★'.repeat(a.s)}</div>
+      <div class="nc-ti">${a.no} ${a.ti}</div>
+      <div class="nc-en">${a.en}</div>
+    </div>`;
+  }).join('');
+}
+
+function pickStar(i){
+  sw('typing', document.querySelectorAll('.ni')[1]);
+  setTimeout(()=>pickArt(i),100);
+}
+
+// ══════════════════════════════════════════════
+// GAS
+// ══════════════════════════════════════════════
+function saveGAS(){
+  ST.gasURL=document.getElementById('gasURL').value.trim();
+  localStorage.setItem('fs_gas',ST.gasURL);
+  document.getElementById('gasSaved').textContent='✓ 已儲存';
+  toast('GAS URL 已儲存');
+}
+
+async function pushToLINE(){
+  const btn=document.getElementById('pushBtn');
+  if(!ST.gasURL){ toast('請先在「GAS 後端設定」填入 Web App URL'); return; }
+  const wpm=ST.bestWpm;
+  const msg=`📊 Fay's Spectrum 打字報告\n`+
+    `最佳紀錄：${wpm} WPM\n`+
+    `今日已讀：${ST.todayR} 條\n`+
+    `考試倒數：${daysLeft()} 天\n`+
+    `最常錯字：${Object.entries(ST.wrongCh).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k])=>k).join(' ')}\n`+
+    `加油 Fay！🔥`;
+  try{
+    await fetch(ST.gasURL+'?action=push&msg='+encodeURIComponent(msg));
+    toast('📱 已推播到 LINE！');
+  } catch(e){ toast('推播失敗：'+e.message); }
+}
+
+// ══════════════════════════════════════════════
+// 初始化
+// ══════════════════════════════════════════════
+function init(){
+  renderDash();
+  buildArtList();
+  nextText();
+  renderStar5();
+  renderWeak();
+  document.getElementById('gasURL').value=ST.gasURL;
+  setInterval(updateNow,30000);
+}
+
+init();
+</script>
+</body>
+</html>
