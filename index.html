@@ -312,6 +312,75 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 }
 .now-cur{font-size:15px;font-weight:500;color:var(--blue-d);}
 .now-next{font-size:12px;color:var(--muted);margin-top:3px;}
+
+/* ── 會計練習 ── */
+.acct-tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:1rem;}
+.at{padding:6px 14px;border-radius:99px;border:0.5px solid var(--borderM);background:transparent;cursor:pointer;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--muted);transition:all .15s;}
+.at.on{background:var(--teal-l);border-color:var(--teal-m);color:var(--text);}
+.at:hover:not(.on){background:var(--surface);}
+
+.apane{display:none;} .apane.on{display:block;}
+
+/* MCQ */
+.mcq-q{font-size:15px;line-height:1.7;margin-bottom:1rem;font-family:'Noto Serif TC',serif;}
+.mcq-opts{display:flex;flex-direction:column;gap:6px;margin-bottom:1rem;}
+.mcq-opt{
+  padding:.75rem 1rem;border-radius:var(--r);
+  border:0.5px solid var(--border);background:var(--surface);
+  cursor:pointer;font-size:13px;text-align:left;
+  font-family:'DM Sans',sans-serif;color:var(--text);
+  transition:all .15s;
+}
+.mcq-opt:hover:not(:disabled){background:var(--blue-l);border-color:var(--blue);}
+.mcq-opt.correct{background:var(--teal-l);border-color:var(--teal-m);color:var(--teal-m);}
+.mcq-opt.wrong{background:var(--rose-l);border-color:var(--rose-m);color:var(--rose-m);}
+.mcq-opt:disabled{cursor:default;}
+.mcq-exp{
+  background:var(--amber-l);border:0.5px solid var(--amber);
+  border-radius:var(--r);padding:.75rem 1rem;
+  font-size:12px;line-height:1.7;color:var(--text);
+  display:none;margin-bottom:1rem;
+}
+.mcq-exp.show{display:block;}
+.mcq-prog{font-size:11px;color:var(--hint);font-family:'DM Sans',sans-serif;margin-bottom:.5rem;}
+
+/* Fill */
+.fill-q{font-size:15px;line-height:1.8;margin-bottom:.75rem;font-family:'Noto Serif TC',serif;}
+.fill-in{
+  border:none;border-bottom:1.5px solid var(--borderM);
+  background:transparent;font-size:15px;font-family:'Noto Serif TC',serif;
+  color:var(--text);outline:none;padding:2px 6px;
+  min-width:120px;text-align:center;transition:border-color .2s;
+}
+.fill-in:focus{border-color:var(--teal-m);}
+.fill-in.ok{border-color:var(--sage-m);color:var(--sage-m);}
+.fill-in.ng{border-color:var(--rose-m);color:var(--rose-m);}
+.fill-exp{font-size:12px;color:var(--muted);line-height:1.6;margin-top:.5rem;display:none;}
+.fill-exp.show{display:block;}
+
+/* DC table */
+.dc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;}
+.dc-card{
+  background:var(--surface);border-radius:var(--r);padding:.75rem .9rem;
+  border:0.5px solid var(--border);cursor:pointer;transition:all .2s;
+  text-align:center;
+}
+.dc-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(58,53,48,.1);}
+.dc-card.asset{border-top:3px solid var(--blue-m);}
+.dc-card.liab{border-top:3px solid var(--rose-m);}
+.dc-card.equity{border-top:3px solid var(--purple-m);}
+.dc-card.rev{border-top:3px solid var(--sage-m);}
+.dc-card.exp{border-top:3px solid var(--amber-m);}
+.dc-name{font-size:14px;font-weight:500;margin-bottom:4px;}
+.dc-type{font-size:10px;color:var(--hint);font-family:'DM Sans',sans-serif;margin-bottom:6px;}
+.dc-sides{display:flex;justify-content:space-between;font-size:11px;font-family:'DM Sans',sans-serif;}
+.dc-dr{color:var(--blue-d);} .dc-cr{color:var(--rose-m);}
+.dc-flip{
+  background:var(--teal-l);border-radius:var(--r);
+  padding:1rem;text-align:center;display:none;margin-top:8px;
+}
+.dc-flip.show{display:block;}
+
 </style>
 </head>
 <body>
@@ -333,6 +402,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <button class="ni" onclick="sw('weak',this)"><span class="ni-ic">◇</span>弱點分析</button>
     <button class="ni" onclick="sw('notion',this)"><span class="ni-ic">◉</span>Notion 速查</button>
     <button class="ni" onclick="sw('gas',this)"><span class="ni-ic">◐</span>GAS 後端設定</button>
+    <button class="ni" onclick="sw('acct',this)"><span class="ni-ic">◆</span>會計練習</button>
     <button class="ni" onclick="sw('sched',this)"><span class="ni-ic">○</span>作息時刻表</button>
   </div>
   <div class="sf">
@@ -618,6 +688,98 @@ function linePush(msg) {
   </div>
 </div>
 
+
+<!-- ── 會計練習 ── -->
+<div class="pane" id="pane-acct">
+  <div class="pg-title">會計練習</div>
+
+  <div class="acct-tabs">
+    <button class="at on" onclick="swAcct('mcq',this)">選擇題</button>
+    <button class="at" onclick="swAcct('fill',this)">填空題</button>
+    <button class="at" onclick="swAcct('dc',this)">借貸方向</button>
+    <button class="at" onclick="swAcct('ty',this)">分錄打字</button>
+  </div>
+
+  <!-- 選擇題 -->
+  <div class="apane on" id="ap-mcq">
+    <div class="card">
+      <div class="flex" style="justify-content:space-between;margin-bottom:.5rem;">
+        <div class="sec" style="margin:0">選擇題</div>
+        <span class="mcq-prog" id="mcqProg">第 1 / 10 題</span>
+      </div>
+      <div class="mcq-q" id="mcqQ"></div>
+      <div class="mcq-opts" id="mcqOpts"></div>
+      <div class="mcq-exp" id="mcqExp"></div>
+      <div class="flex">
+        <button class="btn btn-blue btn-sm" id="mcqNext" onclick="nextMCQ()" style="display:none">下一題 →</button>
+        <span id="mcqScore" style="font-size:12px;color:var(--muted)"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 填空題 -->
+  <div class="apane" id="ap-fill">
+    <div class="card">
+      <div class="flex" style="justify-content:space-between;margin-bottom:.5rem;">
+        <div class="sec" style="margin:0">填空題</div>
+        <span class="mcq-prog" id="fillProg">第 1 / 8 題</span>
+      </div>
+      <div class="fill-q" id="fillQ"></div>
+      <div class="flex" style="margin-bottom:.5rem;">
+        <button class="btn btn-teal btn-sm" onclick="checkFill()">確認</button>
+        <button class="btn btn-sm" onclick="nextFill()">跳過</button>
+      </div>
+      <div class="fill-exp" id="fillExp"></div>
+    </div>
+  </div>
+
+  <!-- 借貸方向 -->
+  <div class="apane" id="ap-dc">
+    <div class="card">
+      <div class="sec">科目借貸方向一覽（點擊看記憶口訣）</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;font-size:11px;font-family:'DM Sans',sans-serif;">
+        <span><span style="display:inline-block;width:10px;height:10px;background:var(--blue-m);border-radius:2px;margin-right:4px;vertical-align:middle"></span>資產</span>
+        <span><span style="display:inline-block;width:10px;height:10px;background:var(--rose-m);border-radius:2px;margin-right:4px;vertical-align:middle"></span>負債</span>
+        <span><span style="display:inline-block;width:10px;height:10px;background:var(--purple-m);border-radius:2px;margin-right:4px;vertical-align:middle"></span>權益</span>
+        <span><span style="display:inline-block;width:10px;height:10px;background:var(--sage-m);border-radius:2px;margin-right:4px;vertical-align:middle"></span>收入</span>
+        <span><span style="display:inline-block;width:10px;height:10px;background:var(--amber-m);border-radius:2px;margin-right:4px;vertical-align:middle"></span>費損</span>
+      </div>
+      <div class="dc-grid" id="dcGrid"></div>
+      <div class="dc-flip" id="dcFlip"></div>
+      <div class="divider"></div>
+      <div style="background:var(--blue-ll);border-radius:var(--r);padding:.9rem 1rem;font-size:13px;line-height:1.8;">
+        <strong>記憶口訣</strong><br>
+        資產、費損 → 借增貸減（左手邊）<br>
+        負債、權益、收入 → 貸增借減（右手邊）<br>
+        <span style="font-size:11px;color:var(--muted)">口訣：「費資借增，收負權貸增」</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 分錄打字 -->
+  <div class="apane" id="ap-ty">
+    <div class="card">
+      <div class="sec">分錄打字練習</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">
+        看題目輸入完整分錄，例如：借：現金 100,000 貸：銷貨收入 100,000
+      </div>
+      <div class="ty-disp" id="acctTyDisp"></div>
+      <textarea class="ty-in" id="acctTyIn"
+        placeholder="輸入分錄…"
+        oninput="onAcctInput()"
+        onkeydown="if(event.key==='Enter'&&acctDone){event.preventDefault();nextAcctText();}"
+        spellcheck="false" autocomplete="off"></textarea>
+      <div class="ty-stats">
+        <span>準確 <strong id="acctAcc" style="color:var(--sage-m)">100</strong>%</span>
+        <span>進度 <strong id="acctProg" style="color:var(--teal-m)">0/0</strong></span>
+        <div style="flex:1"></div>
+        <button class="btn btn-sm" onclick="nextAcctText()">換題</button>
+        <button class="btn btn-teal btn-sm" onclick="resetAcctTy()">重置</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ── 作息時刻表 ── -->
 <div class="pane" id="pane-sched">
   <div class="pg-title">作息時刻表</div>
@@ -644,14 +806,18 @@ function linePush(msg) {
     </div>
   </div>
   <div class="card">
-    <div class="sec">每日作息 · 4月起新制</div>
-    <div class="sr"><div class="sd" style="background:var(--rose-m)"></div><div class="st">09:00 – 12:30</div><div class="sk">半天工作</div><div class="sw">高產出</div></div>
-    <div class="sr"><div class="sd" style="background:var(--blue-m)"></div><div class="st">13:00 – 15:30</div><div class="sk">會計學概要</div><div class="sw">35%</div></div>
-    <div class="sr"><div class="sd" style="background:var(--purple-m)"></div><div class="st">15:30 – 17:30</div><div class="sk">稅務相關法規</div><div class="sw">30%</div></div>
-    <div class="sr"><div class="sd" style="background:var(--rose-m)"></div><div class="st">17:30 – 19:00</div><div class="sk">租稅申報實務</div><div class="sw">25%</div></div>
-    <div class="sr"><div class="sd" style="background:var(--sage-m)"></div><div class="st">19:00 – 20:00</div><div class="sk">記帳相關法規</div><div class="sw">10%</div></div>
-    <div class="sr"><div class="sd" style="background:var(--hint)"></div><div class="st">20:00 – 21:00</div><div class="sk">複習 + 打字練習</div><div class="sw">鞏固</div></div>
-    <div class="sr"><div class="sd" style="background:var(--teal-m)"></div><div class="st">21:30 – 22:30</div><div class="sk">健身房</div><div class="sw">修復</div></div>
+    <div class="flex" style="justify-content:space-between;margin-bottom:10px;">
+      <div class="sec" style="margin:0">每日作息</div>
+      <button class="btn btn-sm" id="editSchedBtn" onclick="toggleEditSched()">編輯</button>
+    </div>
+    <div id="schedRows"></div>
+    <div id="addSchedWrap" style="display:none;margin-top:8px;">
+      <div class="flex" style="gap:6px;">
+        <input class="n-in" id="newSchedTime" placeholder="時間 09:00–12:30" style="flex:1;margin:0;font-size:12px;"/>
+        <input class="n-in" id="newSchedTask" placeholder="任務名稱" style="flex:1;margin:0;font-size:12px;"/>
+        <button class="btn btn-teal btn-sm" onclick="addSchedRow()">＋</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -833,6 +999,7 @@ function renderWeak(){
 function renderSched(){
   document.getElementById('bigCD').textContent=daysLeft();
   updateNow();
+  renderSchedRows();
 }
 
 function updateNow(){
@@ -1168,6 +1335,279 @@ function init(){
 }
 
 init();
+
+// ══════════════════════════════════════════════
+// 會計資料
+// ══════════════════════════════════════════════
+const MCQ = [
+  {q:"下列何者為資產科目？",opts:["應付帳款","預收收入","預付費用","業主往來"],ans:2,exp:"預付費用是預先支付但尚未消耗的費用，屬於流動資產。"},
+  {q:"購入辦公設備 $120,000，以現金支付，正確分錄為何？",opts:["借：辦公設備 120,000 / 貸：現金 120,000","借：現金 120,000 / 貸：辦公設備 120,000","借：辦公費用 120,000 / 貸：現金 120,000","借：辦公設備 120,000 / 貸：應付帳款 120,000"],ans:0,exp:"購入資產借記資產科目，貸記現金（資產減少）。"},
+  {q:"期末存貨低估，對本期損益的影響為何？",opts:["淨利高估","淨利低估","無影響","銷貨成本低估"],ans:1,exp:"期末存貨低估 → 銷貨成本高估 → 毛利低估 → 淨利低估。"},
+  {q:"下列何者不屬於流動負債？",opts:["應付薪資","預收貨款","長期借款—一年內到期部分","應付公司債（到期日三年後）"],ans:3,exp:"應付公司債到期日超過一年者屬長期負債，非流動負債。"},
+  {q:"以成本法記錄長期股權投資，被投資公司宣告發放現金股利時，投資公司應：",opts:["認列投資收益","減少投資帳面金額","認列股利收入","不做任何分錄"],ans:2,exp:"成本法下收到現金股利認列為股利收入，借記應收股利，貸記股利收入。"},
+  {q:"下列何種折舊方法，早期提列折舊較多？",opts:["直線法","生產數量法","倍數餘額遞減法","以上皆非"],ans:2,exp:"倍數餘額遞減法（加速折舊法）早期提列較多折舊，後期遞減。"},
+  {q:"銀行存款調節表中，「已開出未兌現支票」應如何處理？",opts:["加入銀行餘額","減去銀行餘額","加入帳面餘額","減去帳面餘額"],ans:1,exp:"已開出未兌現支票已記帳但銀行尚未扣款，故從銀行餘額中減去。"},
+  {q:"下列何者會使會計等式借貸雙方同時增加？",opts:["以現金購買存貨","賒購商品","償還應付帳款","收回應收帳款"],ans:1,exp:"賒購商品：借存貨（資產+），貸應付帳款（負債+），兩邊同增。"},
+  {q:"商業會計法規定，各種帳簿及財務報表應保存至少幾年？",opts:["五年","七年","十年","十五年"],ans:2,exp:"商業會計法第38條規定，各種帳簿及財務報表應保存十年。"},
+  {q:"毛利率40%，銷貨成本為 $600,000，則銷貨收入為何？",opts:["$840,000","$900,000","$1,000,000","$1,500,000"],ans:2,exp:"銷貨成本=60%×銷貨收入，600,000÷0.6=$1,000,000。"},
+  {q:"下列哪一項屬於「應計費用」的調整分錄？",opts:["借：預付費用 / 貸：現金","借：費用 / 貸：應付費用","借：現金 / 貸：預收收入","借：應收收入 / 貸：收入"],ans:1,exp:"應計費用：費用已發生但尚未付款，應借記費用，貸記應付費用。"},
+  {q:"下列何者為「遞延項目」？",opts:["應計薪資","應收利息","預付租金","應付所得稅"],ans:2,exp:"預付租金是已付款但尚未消耗的費用，屬遞延費用（資產）。"},
+];
+
+const FILL = [
+  {q:"會計恆等式：資產 ＝ _____ ＋ _____",ans:["負債＋業主權益","負債+業主權益","負債+股東權益","負債＋股東權益"],exp:"資產 = 負債 + 業主（股東）權益，永遠成立。"},
+  {q:"銷貨毛利 ＝ 銷貨收入 － _____",ans:["銷貨成本"],exp:"毛利 = 銷貨收入 - 銷貨成本，尚未扣除營業費用。"},
+  {q:"直線法每年折舊額 ＝（成本 － 殘值）÷ _____",ans:["耐用年數","使用年限","耐用年限"],exp:"直線法按耐用年數平均分攤，每年折舊額固定。"},
+  {q:"銷貨成本 ＝ 期初存貨 ＋ 本期進貨 － _____",ans:["期末存貨"],exp:"銷貨成本公式，期末存貨越高則銷貨成本越低。"},
+  {q:"流動比率 ＝ 流動資產 ÷ _____",ans:["流動負債"],exp:"流動比率衡量短期償債能力，一般認為大於2較佳。"},
+  {q:"應收帳款週轉率 ＝ 賒銷淨額 ÷ _____",ans:["平均應收帳款","平均應收帳款餘額"],exp:"週轉率越高代表收款效率越好，平均收款天數=365÷週轉率。"},
+  {q:"資本公積屬於_____項目",ans:["股東權益","業主權益"],exp:"資本公積包含股票發行溢價等，屬股東權益的一部分。"},
+  {q:"期末調整目的在使帳目符合_____基礎",ans:["應計","權責發生"],exp:"應計基礎（權責發生制）：收益在賺得時認列，費用在發生時認列。"},
+];
+
+const DC = [
+  {name:"現金",type:"資產",dr:"增加",cr:"減少",cls:"asset",tip:"資產類科目：借增貸減，現金是最直觀的例子"},
+  {name:"應收帳款",type:"資產",dr:"增加",cr:"減少",cls:"asset",tip:"賒銷時借記應收帳款，收款時貸記"},
+  {name:"存貨",type:"資產",dr:"增加",cr:"減少",cls:"asset",tip:"進貨借記，銷貨認列成本時貸記"},
+  {name:"固定資產",type:"資產",dr:"增加",cr:"減少",cls:"asset",tip:"購入時借記，處分時貸記"},
+  {name:"預付費用",type:"資產",dr:"增加",cr:"減少",cls:"asset",tip:"預付時借記，攤銷時貸記轉費用"},
+  {name:"應付帳款",type:"負債",dr:"減少",cr:"增加",cls:"liab",tip:"負債類：貸增借減，賒購時貸記"},
+  {name:"應付薪資",type:"負債",dr:"減少",cr:"增加",cls:"liab",tip:"薪資費用發生時貸記應付薪資"},
+  {name:"預收收入",type:"負債",dr:"減少",cr:"增加",cls:"liab",tip:"預收款項時貸記，實現收入時借記轉收入"},
+  {name:"股本",type:"權益",dr:"減少",cr:"增加",cls:"equity",tip:"權益類：貸增借減，發行股票時貸記"},
+  {name:"保留盈餘",type:"權益",dr:"減少",cr:"增加",cls:"equity",tip:"本期淨利增加保留盈餘，發放股利減少"},
+  {name:"銷貨收入",type:"收入",dr:"減少",cr:"增加",cls:"rev",tip:"收入類：貸增借減，銷貨時貸記"},
+  {name:"銷貨成本",type:"費損",dr:"增加",cr:"減少",cls:"exp",tip:"費損類：借增貸減，確認銷售時借記"},
+  {name:"薪資費用",type:"費損",dr:"增加",cr:"減少",cls:"exp",tip:"費用發生時借記"},
+  {name:"折舊費用",type:"費損",dr:"增加",cr:"減少",cls:"exp",tip:"期末調整：借折舊費用，貸累計折舊"},
+];
+
+const ACCT_TYPING = [
+  "借：現金 100,000 貸：銷貨收入 100,000",
+  "借：應收帳款 50,000 貸：銷貨收入 50,000",
+  "借：銷貨成本 30,000 貸：存貨 30,000",
+  "借：薪資費用 80,000 貸：應付薪資 80,000",
+  "借：辦公設備 200,000 貸：現金 200,000",
+  "借：折舊費用 20,000 貸：累計折舊 20,000",
+  "借：應付帳款 60,000 貸：現金 60,000",
+  "借：預付租金 36,000 貸：現金 36,000",
+  "借：保險費用 3,000 貸：預付保險費 3,000",
+  "借：壞帳費用 5,000 貸：備抵壞帳 5,000",
+  "借：現金 500,000 貸：股本 500,000",
+  "借：存貨 150,000 貸：應付帳款 150,000",
+];
+
+// ── 會計分頁切換 ──
+function swAcct(id, btn){
+  document.querySelectorAll('.apane').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.at').forEach(b=>b.classList.remove('on'));
+  document.getElementById('ap-'+id).classList.add('on');
+  btn.classList.add('on');
+  if(id==='dc') renderDC();
+  if(id==='ty') { acctText=ACCT_TYPING[Math.floor(Math.random()*ACCT_TYPING.length)]; resetAcctTy(); }
+}
+
+// ── 選擇題 ──
+let mcqIdx=0, mcqScore=0, mcqShuffled=[];
+function initMCQ(){
+  mcqShuffled=[...MCQ].sort(()=>Math.random()-.5).slice(0,10);
+  mcqIdx=0; mcqScore=0;
+  renderMCQ();
+}
+function renderMCQ(){
+  if(mcqIdx>=mcqShuffled.length){
+    document.getElementById('mcqQ').textContent='全部完成！';
+    document.getElementById('mcqOpts').innerHTML='';
+    document.getElementById('mcqScore').textContent='得分：'+mcqScore+'/'+mcqShuffled.length;
+    document.getElementById('mcqNext').style.display='none';
+    return;
+  }
+  const q=mcqShuffled[mcqIdx];
+  document.getElementById('mcqProg').textContent='第 '+(mcqIdx+1)+' / '+mcqShuffled.length+' 題';
+  document.getElementById('mcqQ').textContent=q.q;
+  document.getElementById('mcqExp').className='mcq-exp';
+  document.getElementById('mcqNext').style.display='none';
+  document.getElementById('mcqScore').textContent='';
+  document.getElementById('mcqOpts').innerHTML=q.opts.map((o,i)=>
+    `<button class="mcq-opt" onclick="answerMCQ(${i})">${String.fromCharCode(65+i)}. ${o}</button>`
+  ).join('');
+}
+function answerMCQ(i){
+  const q=mcqShuffled[mcqIdx];
+  const btns=document.querySelectorAll('.mcq-opt');
+  btns.forEach(b=>b.disabled=true);
+  btns[q.ans].classList.add('correct');
+  if(i===q.ans){ mcqScore++; toast('✓ 正確！'); }
+  else{ btns[i].classList.add('wrong'); toast('✗ 答錯了'); }
+  const exp=document.getElementById('mcqExp');
+  exp.textContent='解析：'+q.exp;
+  exp.classList.add('show');
+  document.getElementById('mcqNext').style.display='inline-flex';
+}
+function nextMCQ(){ mcqIdx++; renderMCQ(); }
+
+// ── 填空題 ──
+let fillIdx=0, fillShuffled=[];
+function initFill(){
+  fillShuffled=[...FILL].sort(()=>Math.random()-.5);
+  fillIdx=0; renderFill();
+}
+function renderFill(){
+  if(fillIdx>=fillShuffled.length){ fillIdx=0; }
+  const f=fillShuffled[fillIdx];
+  document.getElementById('fillProg').textContent='第 '+(fillIdx+1)+' / '+fillShuffled.length+' 題';
+  // 把 _____ 換成 input
+  let html=f.q.replace(/_{3,}/g, '<input class="fill-in" id="fillAns" placeholder="填入答案" autocomplete="off">');
+  document.getElementById('fillQ').innerHTML=html;
+  document.getElementById('fillExp').className='fill-exp';
+  const inp=document.getElementById('fillAns');
+  if(inp){ inp.addEventListener('keydown',e=>{if(e.key==='Enter')checkFill();}); inp.focus(); }
+}
+function checkFill(){
+  const f=fillShuffled[fillIdx];
+  const inp=document.getElementById('fillAns');
+  if(!inp) return;
+  const val=inp.value.trim();
+  const ok=f.ans.some(a=>val.includes(a.replace(/[＋+]/g,'')));
+  inp.className='fill-in '+(ok?'ok':'ng');
+  inp.disabled=true;
+  const exp=document.getElementById('fillExp');
+  exp.textContent=(ok?'✓ 正確！　':'✗ 參考答案：'+f.ans[0]+'　')+f.exp;
+  exp.className='fill-exp show';
+  setTimeout(()=>{ if(ok) nextFill(); },ok?1200:2500);
+}
+function nextFill(){ fillIdx++; renderFill(); }
+
+// ── 借貸方向 ──
+let dcSelected=null;
+function renderDC(){
+  document.getElementById('dcGrid').innerHTML=DC.map((d,i)=>`
+    <div class="dc-card ${d.cls}" onclick="showDC(${i})" id="dc${i}">
+      <div class="dc-name">${d.name}</div>
+      <div class="dc-type">${d.type}</div>
+      <div class="dc-sides">
+        <span class="dc-dr">借：${d.dr}</span>
+        <span class="dc-cr">貸：${d.cr}</span>
+      </div>
+    </div>`).join('');
+}
+function showDC(i){
+  document.querySelectorAll('.dc-card').forEach(c=>c.style.opacity='1');
+  document.getElementById('dc'+i).style.opacity='.6';
+  const d=DC[i];
+  const fl=document.getElementById('dcFlip');
+  fl.innerHTML=`<strong>${d.name}</strong>（${d.type}）正常餘額在<strong style="color:var(--${d.cls==='asset'||d.cls==='exp'?'blue-d':'rose-m'})">${d.cls==='asset'||d.cls==='exp'?'借方':'貸方'}</strong><br><span style="font-size:12px;color:var(--muted)">${d.tip}</span>`;
+  fl.className='dc-flip show';
+}
+
+// ── 分錄打字 ──
+let acctText='', acctDone=false;
+function onAcctInput(){
+  const v=document.getElementById('acctTyIn').value;
+  if(acctDone) return;
+  let h='', ok=0;
+  for(let i=0;i<acctText.length;i++){
+    const ch=acctText[i]===' '?'&nbsp;':acctText[i];
+    if(i<v.length){ const c=v[i]===acctText[i]; if(c)ok++; h+=`<span class="${c?'cc':'cw'}">${ch}</span>`; }
+    else if(i===v.length) h+=`<span class="cur">${ch}</span>`;
+    else h+=`<span class="cp">${ch}</span>`;
+  }
+  document.getElementById('acctTyDisp').innerHTML=h;
+  const acc=v.length?Math.round(ok/v.length*100):100;
+  document.getElementById('acctAcc').textContent=acc;
+  document.getElementById('acctProg').textContent=v.length+'/'+acctText.length;
+  if(v.length>=acctText.length){ acctDone=true; document.getElementById('acctTyIn').disabled=true; toast('分錄完成！按 Enter 換題'); }
+}
+function resetAcctTy(){
+  acctDone=false;
+  const inp=document.getElementById('acctTyIn');
+  inp.value=''; inp.disabled=false;
+  document.getElementById('acctTyDisp').innerHTML=acctText.split('').map((c,i)=>i===0?`<span class="cur">${c==' '?'&nbsp;':c}</span>`:`<span class="cp">${c==' '?'&nbsp;':c}</span>`).join('');
+  document.getElementById('acctAcc').textContent='100';
+  document.getElementById('acctProg').textContent='0/'+acctText.length;
+  inp.focus();
+}
+function nextAcctText(){
+  acctText=ACCT_TYPING[Math.floor(Math.random()*ACCT_TYPING.length)];
+  resetAcctTy();
+}
+
+
+// ══════════════════════════════════════════════
+// 可編輯作息
+// ══════════════════════════════════════════════
+const DEFAULT_SCHED = [
+  {time:"09:00 – 12:30", task:"半天工作",      color:"var(--rose-m)",   note:"高產出"},
+  {time:"13:00 – 15:30", task:"會計學概要",    color:"var(--blue-m)",   note:"35%"},
+  {time:"15:30 – 17:30", task:"稅務相關法規",  color:"var(--purple-m)", note:"30%"},
+  {time:"17:30 – 19:00", task:"租稅申報實務",  color:"var(--rose-m)",   note:"25%"},
+  {time:"19:00 – 20:00", task:"記帳相關法規",  color:"var(--sage-m)",   note:"10%"},
+  {time:"20:00 – 21:00", task:"複習 + 打字練習",color:"var(--hint)",   note:"鞏固"},
+  {time:"21:30 – 22:30", task:"健身房",        color:"var(--teal-m)",   note:"修復"},
+];
+
+let schedData = JSON.parse(localStorage.getItem('fs_sched') || 'null') || DEFAULT_SCHED;
+let schedEditing = false;
+
+function saveSched(){ localStorage.setItem('fs_sched', JSON.stringify(schedData)); }
+
+function renderSchedRows(){
+  const wrap = document.getElementById('schedRows');
+  if(!wrap) return;
+  if(schedEditing){
+    wrap.innerHTML = schedData.map((s,i)=>`
+      <div class="sr" style="align-items:flex-start;gap:6px;">
+        <div class="sd" style="background:${s.color};margin-top:12px;flex-shrink:0"></div>
+        <input value="${s.time}" onchange="schedData[${i}].time=this.value;saveSched();"
+          style="flex:1;border:none;border-bottom:0.5px solid var(--borderM);background:transparent;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--muted);padding:4px;outline:none;"/>
+        <input value="${s.task}" onchange="schedData[${i}].task=this.value;saveSched();"
+          style="flex:2;border:none;border-bottom:0.5px solid var(--borderM);background:transparent;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);padding:4px;outline:none;"/>
+        <button onclick="deleteSchedRow(${i})" style="border:none;background:transparent;color:var(--rose-m);cursor:pointer;font-size:14px;padding:4px;">×</button>
+      </div>`).join('');
+  } else {
+    wrap.innerHTML = schedData.map(s=>`
+      <div class="sr">
+        <div class="sd" style="background:${s.color}"></div>
+        <div class="st">${s.time}</div>
+        <div class="sk">${s.task}</div>
+        <div class="sw">${s.note||''}</div>
+      </div>`).join('');
+  }
+}
+
+function toggleEditSched(){
+  schedEditing = !schedEditing;
+  const btn = document.getElementById('editSchedBtn');
+  if(btn) btn.textContent = schedEditing ? '完成' : '編輯';
+  const add = document.getElementById('addSchedWrap');
+  if(add) add.style.display = schedEditing ? 'block' : 'none';
+  renderSchedRows();
+}
+
+function deleteSchedRow(i){
+  schedData.splice(i,1); saveSched(); renderSchedRows();
+}
+
+function addSchedRow(){
+  const t = document.getElementById('newSchedTime').value.trim();
+  const k = document.getElementById('newSchedTask').value.trim();
+  if(!t||!k){ toast('請填入時間和任務'); return; }
+  schedData.push({time:t, task:k, color:'var(--blue-m)', note:''});
+  saveSched();
+  document.getElementById('newSchedTime').value='';
+  document.getElementById('newSchedTask').value='';
+  renderSchedRows();
+}
+
+function resetSchedToDefault(){
+  if(confirm('確定要還原預設作息嗎？')) {
+    schedData = [...DEFAULT_SCHED];
+    saveSched();
+    renderSchedRows();
+    toast('已還原預設作息');
+  }
+}
+
 </script>
 </body>
 </html>
