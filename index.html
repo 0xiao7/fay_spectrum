@@ -388,7 +388,35 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 <button class="hbg" id="hbg" onclick="toggleSidebar()">☰</button>
 <div class="mask" id="mask" onclick="toggleSidebar()"></div>
 
-<div class="shell">
+<!-- ── 序號驗證閘道 ── -->
+<div id="serial-gate" style="
+  display:flex; position:fixed; inset:0; z-index:9999;
+  background:#1A1A2E; align-items:center; justify-content:center;
+  font-family:'DM Sans',sans-serif;">
+  <div style="width:100%;max-width:400px;padding:0 24px;">
+    <h1 style="font-family:'Noto Serif TC',serif;font-size:20px;font-weight:400;
+      color:#E5B3B3;text-align:center;letter-spacing:.06em;">
+      SoFa 索法｜法條查詢工具
+    </h1>
+    <p style="font-size:13px;color:#888;text-align:center;margin-top:8px;">
+      請輸入您的序號以使用工具
+    </p>
+    <input id="serial-input" type="text" placeholder="SOFA-XXXX-XXXX"
+      style="width:100%;margin-top:24px;padding:12px;border-radius:8px;
+      border:1px solid #E5B3B3;background:#242440;color:#E5B3B3;
+      font-size:15px;outline:none;box-sizing:border-box;"/>
+    <button id="serial-btn"
+      style="width:100%;margin-top:12px;padding:12px;background:#E5B3B3;
+      color:#1A1A2E;border-radius:8px;font-size:15px;font-weight:500;
+      cursor:pointer;border:none;">
+      驗證序號
+    </button>
+    <div id="serial-error" style="margin-top:12px;font-size:13px;color:#ff8080;
+      display:none;text-align:center;"></div>
+  </div>
+</div>
+
+<div id="main-shell" class="shell" style="display:none;">
 
 <!-- SIDEBAR -->
 <nav class="sidebar" id="sidebar">
@@ -1608,6 +1636,83 @@ function resetSchedToDefault(){
   }
 }
 
+</script>
+
+<!-- ── 序號驗證：初始化（同步，避免閃爍）── -->
+<script>
+(function(){
+  if(localStorage.getItem('sofa_token')){
+    var gate = document.getElementById('serial-gate');
+    var shell = document.getElementById('main-shell');
+    if(gate) gate.style.display = 'none';
+    if(shell) shell.style.display = 'flex';
+  }
+})();
+</script>
+
+<!-- ── Firebase SDK v10 compat ── -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script>
+// ── Firebase 序號驗證 ────────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "FIREBASE_API_KEY",
+  authDomain: "FIREBASE_AUTH_DOMAIN",
+  projectId: "FIREBASE_PROJECT_ID",
+  storageBucket: "FIREBASE_STORAGE_BUCKET",
+  messagingSenderId: "FIREBASE_MESSAGING_SENDER_ID",
+  appId: "FIREBASE_APP_ID"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+function showSerialError(msg){
+  var el = document.getElementById('serial-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+async function validateSerial(){
+  var input = document.getElementById('serial-input');
+  var btn   = document.getElementById('serial-btn');
+  var code  = input.value.trim().toUpperCase();
+
+  document.getElementById('serial-error').style.display = 'none';
+
+  if(!code){ showSerialError('請輸入序號'); return; }
+
+  btn.textContent = '驗證中...';
+  btn.disabled = true;
+
+  try{
+    var snap = await db.collection('serials').where('serial_code','==',code).get();
+    if(snap.empty){
+      showSerialError('序號無效，請確認購買確認 Email 中的序號');
+    } else {
+      var doc = snap.docs[0];
+      if(doc.data().used === true){
+        showSerialError('此序號已使用，請確認是否已在其他裝置登入');
+      } else {
+        await doc.ref.update({ used: true, used_at: new Date() });
+        localStorage.setItem('sofa_token', code);
+        document.getElementById('serial-gate').style.display  = 'none';
+        document.getElementById('main-shell').style.display = 'flex';
+      }
+    }
+  } catch(e){
+    showSerialError('驗證失敗，請稍後再試（' + e.message + '）');
+  }
+
+  btn.textContent = '驗證序號';
+  btn.disabled = false;
+}
+
+document.getElementById('serial-btn').addEventListener('click', validateSerial);
+document.getElementById('serial-input').addEventListener('keydown', function(e){
+  if(e.key === 'Enter') validateSerial();
+});
 </script>
 </body>
 </html>
